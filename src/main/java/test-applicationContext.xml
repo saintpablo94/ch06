@@ -29,9 +29,13 @@
 		<property name="dataSource" ref="dataSource" />		
 	</bean>
 	
-	<bean id="userService" class="springbook.user.service.UserService" >
+	<bean id="userServiceImple" class="springbook.user.service.UserServiceImpl">
 		<property name="userDao" ref="userDao" />
-		<property name="transactionManager" ref="transactoinManger" />
 		<property name="mailSender" ref="mailSender" />
+	</bean>
+	
+	<bean id="userService" class="springbook.user.service.UserServiceTx" >
+		<property name="transactionManager" ref="transactoinManger" />
+		<property name="userService" ref="userServiceImple" />
 	</bean>
 </beans>

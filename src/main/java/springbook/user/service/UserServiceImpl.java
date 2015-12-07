@@ -1,5 +1,6 @@
 package springbook.user.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.mail.MailSender;
@@ -19,19 +20,19 @@ public class UserServiceImpl implements UserService {
 	public void setUserDao(UserDao userDao) {
 		this.userDao = userDao;
 	}
-	
+
 	public void setMailSender(MailSender mailSender) {
 		this.mailSender = mailSender;
 	}
 
-	public void upgradeLevels(){
-		
+	public void upgradeLevels() {
+
 		List<User> users = userDao.getAll();
 		for (User user : users) {
 			if (canUpgradeLevel(user)) {
 				upgradeLevel(user);
 			}
-		}			
+		}
 	}
 
 	private boolean canUpgradeLevel(User user) {
@@ -60,8 +61,8 @@ public class UserServiceImpl implements UserService {
 		mailMessage.setTo(user.getEmail());
 		mailMessage.setFrom("abc@a.c");
 		mailMessage.setSubject("Upgrade Infomation");
-		mailMessage.setText("사용자님의 등급이 "+user.getLevel().name());
-		
+		mailMessage.setText("사용자님의 등급이 " + user.getLevel().name());
+
 		this.mailSender.send(mailMessage);
 	}
 
@@ -69,5 +70,44 @@ public class UserServiceImpl implements UserService {
 		if (user.getLevel() == null)
 			user.setLevel(Level.BASIC);
 		userDao.add(user);
+	}
+
+	static class MockUserDao implements UserDao {
+
+		private List<User> users;
+		private List<User> updated = new ArrayList<User>();
+
+		public MockUserDao(List<User> users) {
+			this.users = users;
+		}
+
+		public List<User> getUpdated() {
+			return updated;
+		}
+
+		public List<User> getAll() {
+			return this.users;
+		}
+
+		public void update(User user) {
+			updated.add(user);
+		}
+
+		public void add(User user) {
+			throw new UnsupportedOperationException();
+		}
+
+		public void deleteAll() {
+			throw new UnsupportedOperationException();
+		}
+
+		public User get(String id) {
+			throw new UnsupportedOperationException();
+		}
+
+		public int getCount() {
+			throw new UnsupportedOperationException();
+		}
+
 	}
 }
