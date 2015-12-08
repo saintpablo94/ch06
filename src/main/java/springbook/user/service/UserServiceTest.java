@@ -6,6 +6,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.mockito.Mockito.*;
 
+import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.List;
 
@@ -91,10 +92,6 @@ public class UserServiceTest {
 		verify(mockUserDao).update(users.get(3));
 		assertThat(users.get(3).getLevel(), is(Level.GOLD));
 
-		// List<User> updated = mockUserDao.getUpdated();
-		// assertThat(updated.size(), is(2));
-		// checkUserAndLevel(updated.get(0),"test02",Level.SILVER);
-		// checkUserAndLevel(updated.get(1),"test04",Level.GOLD);
 
 		ArgumentCaptor<SimpleMailMessage> mailMessageArg = ArgumentCaptor
 				.forClass(SimpleMailMessage.class);
@@ -102,18 +99,8 @@ public class UserServiceTest {
 		List<SimpleMailMessage> mailMessages = mailMessageArg.getAllValues();
 		assertThat(mailMessages.get(0).getTo()[0], is(users.get(1).getEmail()));
 		assertThat(mailMessages.get(1).getTo()[0], is(users.get(3).getEmail()));
-
-		// List<String> request = mockMailsender.getRequests();\
-		// assertThat(request.size(), is(2));
-		// assertThat(request.get(0), is(users.get(1).getEmail()));
-		// assertThat(request.get(1), is(users.get(3).getEmail()));
 	}
 
-	private void checkUserAndLevel(User updated, String expectedId,
-			Level expectedLevel) {
-		assertThat(updated.getId(), is(expectedId));
-		assertThat(updated.getLevel(), is(expectedLevel));
-	}
 
 	@Test
 	public void add() {
@@ -140,9 +127,20 @@ public class UserServiceTest {
 		testUserService.setUserDao(userDao);
 		testUserService.setMailSender(mailSender);
 
-		UserServiceTx txUserService = new UserServiceTx();
-		txUserService.setTransactionManager(transactionManager);
-		txUserService.setUserService(testUserService);
+//		UserServiceTx txUserService = new UserServiceTx();
+//		txUserService.setTransactionManager(transactionManager);
+//		txUserService.setUserService(testUserService);
+		
+		TransactionHandler txHandler = new TransactionHandler();
+		txHandler.setTarget(testUserService);
+		txHandler.setTransactionManager(transactionManager);
+		txHandler.setPattern("upgradeLevels");
+		
+		UserService txUserService = 
+				(UserService) Proxy.newProxyInstance(
+				getClass().getClassLoader(),
+				new Class[]{UserService.class}, 
+				txHandler);
 
 		userDao.deleteAll();
 		for (User user : users)
@@ -166,13 +164,4 @@ public class UserServiceTest {
 		}
 	}
 
-	private void checkLevel(User user, boolean upgrade) {
-		User userUpgrade = userDao.get(user.getId());
-		if (upgrade) {
-			assertThat(userUpgrade.getLevel(), is(user.getLevel().nextLevel()));
-		} else {
-			assertThat(userUpgrade.getLevel(), is(user.getLevel()));
-		}
-
-	}
 }
