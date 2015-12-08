@@ -34,8 +34,15 @@
 		<property name="mailSender" ref="mailSender" />
 	</bean>
 	
-	<bean id="userService" class="springbook.user.service.UserServiceTx" >
+<!-- <bean id="userService" class="springbook.user.service.UserServiceTx" >
 		<property name="transactionManager" ref="transactoinManger" />
 		<property name="userService" ref="userServiceImple" />
 	</bean>
+ -->	
+ 	<bean id="userService" class="springbook.user.service.TxProxyFactoryBean" >
+ 		<property name="target" ref="userServiceImple" />
+ 		<property name="transactionManager" ref="transactoinManger" />
+ 		<property name="pattern" value="upgradeLevels" />
+ 		<property name="serviceInterface" value="springbook.user.service.UserService" />
+ 	</bean>	
 </beans>

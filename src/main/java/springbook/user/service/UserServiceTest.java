@@ -126,10 +126,6 @@ public class UserServiceTest {
 				.getId());
 		testUserService.setUserDao(userDao);
 		testUserService.setMailSender(mailSender);
-
-//		UserServiceTx txUserService = new UserServiceTx();
-//		txUserService.setTransactionManager(transactionManager);
-//		txUserService.setUserService(testUserService);
 		
 		TransactionHandler txHandler = new TransactionHandler();
 		txHandler.setTarget(testUserService);
