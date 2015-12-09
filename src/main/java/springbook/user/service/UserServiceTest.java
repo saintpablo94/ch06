@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.junit.internal.runners.statements.Fail;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailSender;
@@ -69,20 +70,13 @@ public class UserServiceTest {
 
 	@Test
 	public void upgradeLevels() throws Exception {
-		// userDao.deleteAll();
-		// for (User user : users) {
-		// userDao.add(user);
-		// }
 
 		UserServiceImpl userServiceImpl = new UserServiceImpl();
-
-		// MockUserDao mockUserDao = new MockUserDao(this.users);
 
 		UserDao mockUserDao = mock(UserDao.class);
 		when(mockUserDao.getAll()).thenReturn(this.users);
 		userServiceImpl.setUserDao(mockUserDao);
 
-		// MockMailsender mockMailsender = new MockMailsender();
 		MailSender mockMailsender = mock(MailSender.class);
 		userServiceImpl.setMailSender(mockMailsender);
 
@@ -131,21 +125,10 @@ public class UserServiceTest {
 		testUserService.setUserDao(userDao);
 		testUserService.setMailSender(mailSender);
 		
-		TxProxyFactoryBean txProxyFactoryBean = 
-				context.getBean("&userService", TxProxyFactoryBean.class);
+		ProxyFactoryBean txProxyFactoryBean = 
+				context.getBean("&userService", ProxyFactoryBean.class);
 		txProxyFactoryBean.setTarget(testUserService);
 		UserService txUserService = (UserService) txProxyFactoryBean.getObject();
-		
-		/*TransactionHandler txHandler = new TransactionHandler();
-		txHandler.setTarget(testUserService);
-		txHandler.setTransactionManager(transactionManager);
-		txHandler.setPattern("upgradeLevels");
-		
-		UserService txUserService = 
-				(UserService) Proxy.newProxyInstance(
-				getClass().getClassLoader(),
-				new Class[]{UserService.class}, 
-				txHandler);*/
 
 		userDao.deleteAll();
 		for (User user : users)
