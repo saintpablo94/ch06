@@ -23,6 +23,8 @@ dependencies {
 	compile "org.springframework:spring-jdbc:${springVersion}"
 	compile "org.springframework:spring-context-support:${springVersion}"
 	
+	compile 'org.springframework:spring-aop:2.5.6'
+	compile 'org.aopalliance:com.springsource.org.aopalliance:1.0.0'
 	compile 'org.springframework.integration:spring-integration-mail:4.1.2.RELEASE'
 	
 	compile 'javax.mail:mail:1.4.1'
