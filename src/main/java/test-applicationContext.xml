@@ -55,7 +55,7 @@
  	
  	<bean id="transactionPointcut" class="springbook.user.service.NameMatchClassMethodPointcut">
  		<property name="mappedClassName" value="*ServiceImpl*" />
- 		<property name="mappedName" value="upgrade" />
+ 		<property name="mappedName" value="upgrade*" />
  	</bean> 	
  	
  	<bean id="transactionAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
@@ -67,6 +67,10 @@
 		<property name="userDao" ref="userDao" />
 		<property name="mailSender" ref="mailSender" />
 	</bean>
+	
+	<bean id="testUserService" 
+		class="springbook.user.service.UserServiceTest$TestUserServiceImpl" 
+		parent="userService" />
  	
  	<!-- <bean id="userService" class="org.springframework.aop.framework.ProxyFactoryBean">
  		<property name="target" ref="userServiceImpl" />

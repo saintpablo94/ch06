@@ -43,6 +43,8 @@ public class UserServiceTest {
 	@Autowired
 	UserService userService;
 	@Autowired
+	UserService testUserService;
+	@Autowired
 	UserServiceImpl userServiceImpl;
 	@Autowired
 	UserDao userDao;
@@ -117,10 +119,9 @@ public class UserServiceTest {
 		assertThat(userWithoutLevelReadUser.getLevel(), is(Level.BASIC));
 	}
 
-	@Test
-	@DirtiesContext
+	@Test	
 	public void upgradeAllOrNothing() throws Exception {
-		UserServiceImpl testUserService = new TestUserService(users.get(3)
+		/*UserServiceImpl testUserService = new TestUserService(users.get(3)
 				.getId());
 		testUserService.setUserDao(userDao);
 		testUserService.setMailSender(mailSender);
@@ -129,21 +130,26 @@ public class UserServiceTest {
 				context.getBean("&userService", ProxyFactoryBean.class);
 		txProxyFactoryBean.setTarget(testUserService);
 		UserService txUserService = (UserService) txProxyFactoryBean.getObject();
-
+*/
 		userDao.deleteAll();
 		for (User user : users)
 			userDao.add(user);
 
 		try {
-			txUserService.upgradeLevels();
+			this.testUserService.upgradeLevels();
 			fail("TestUserServciceException expected");
 		} catch (TestUserServiceException e) {
 		}
 
 		checkLevelUpgraded(users.get(1), false);
 	}
+	
+	@Test
+//	public void advisorAutoProxyCreator(){
+//		assertThat(testUserService, is(java.lang.reflect.Proxy.class));
+//	}
 
-	private void checkLevelUpgraded(User user, boolean upgade) {
+	public void checkLevelUpgraded(User user, boolean upgade) {
 		User userUpgrade = userDao.get(user.getId());
 		if (upgade) {
 			assertThat(userUpgrade.getLevel(), is(user.getLevel().nextLevel()));
