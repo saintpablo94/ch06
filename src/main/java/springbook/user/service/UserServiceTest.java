@@ -151,5 +151,14 @@ public class UserServiceTest {
 			assertThat(userUpgrade.getLevel(), is(user.getLevel()));
 		}
 	}
+	
+	static class TestUserServiceImpl extends UserServiceImpl{
+		private String id ="test04";
+		
+		protected void upgradeLevel(User user) {
+			if(user.getId().equals(this.id)) throw new TestUserServiceException();
+			super.upgradeLevel(user);
+		}
+	}
 
 }
